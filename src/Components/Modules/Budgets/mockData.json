@@ -1,0 +1,409 @@
+[{
+  "month": "Jan",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 908.58
+    },
+    {
+      "category": "Food",
+      "amount": 877.4
+    },
+    {
+      "category": "Clothing",
+      "amount": 117.07
+    },
+    {
+      "category": "Utilities",
+      "amount": 337.17
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 729.58
+    },
+    {
+      "category": "Dividends",
+      "amount": 762.87
+    },
+    {
+      "category": "Gifts",
+      "amount": 713.82
+    }
+  ]
+}, {
+  "month": "Feb",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 805.03
+    },
+    {
+      "category": "Food",
+      "amount": 374.27
+    },
+    {
+      "category": "Clothing",
+      "amount": 694.32
+    },
+    {
+      "category": "Utilities",
+      "amount": 974.74
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 440.39
+    },
+    {
+      "category": "Dividends",
+      "amount": 560.23
+    },
+    {
+      "category": "Gifts",
+      "amount": 990.0
+    }
+  ]
+}, {
+  "month": "Mar",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 683.92
+    },
+    {
+      "category": "Food",
+      "amount": 758.49
+    },
+    {
+      "category": "Clothing",
+      "amount": 17.58
+    },
+    {
+      "category": "Utilities",
+      "amount": 22.69
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 360.1
+    },
+    {
+      "category": "Dividends",
+      "amount": 683.03
+    },
+    {
+      "category": "Gifts",
+      "amount": 948.43
+    }
+  ]
+}, {
+  "month": "Apr",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 506.84
+    },
+    {
+      "category": "Food",
+      "amount": 902.75
+    },
+    {
+      "category": "Clothing",
+      "amount": 923.47
+    },
+    {
+      "category": "Utilities",
+      "amount": 393.49
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 956.85
+    },
+    {
+      "category": "Dividends",
+      "amount": 979.89
+    },
+    {
+      "category": "Gifts",
+      "amount": 920.65
+    }
+  ]
+}, {
+  "month": "May",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 164.14
+    },
+    {
+      "category": "Food",
+      "amount": 442.46
+    },
+    {
+      "category": "Clothing",
+      "amount": 143.73
+    },
+    {
+      "category": "Utilities",
+      "amount": 699.56
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 150.74
+    },
+    {
+      "category": "Dividends",
+      "amount": 693.72
+    },
+    {
+      "category": "Gifts",
+      "amount": 964.77
+    }
+  ]
+}, {
+  "month": "Jun",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 652.88
+    },
+    {
+      "category": "Food",
+      "amount": 634.11
+    },
+    {
+      "category": "Clothing",
+      "amount": 75.4
+    },
+    {
+      "category": "Utilities",
+      "amount": 824.36
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 817.95
+    },
+    {
+      "category": "Dividends",
+      "amount": 369.53
+    },
+    {
+      "category": "Gifts",
+      "amount": 875.16
+    }
+  ]
+}, {
+  "month": "Jul",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 104.67
+    },
+    {
+      "category": "Food",
+      "amount": 876.54
+    },
+    {
+      "category": "Clothing",
+      "amount": 343.38
+    },
+    {
+      "category": "Utilities",
+      "amount": 507.42
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 638.02
+    },
+    {
+      "category": "Dividends",
+      "amount": 342.59
+    },
+    {
+      "category": "Gifts",
+      "amount": 267.43
+    }
+  ]
+}, {
+  "month": "Aug",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 907.42
+    },
+    {
+      "category": "Food",
+      "amount": 725.58
+    },
+    {
+      "category": "Clothing",
+      "amount": 228.77
+    },
+    {
+      "category": "Utilities",
+      "amount": 96.27
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 246.54
+    },
+    {
+      "category": "Dividends",
+      "amount": 881.29
+    },
+    {
+      "category": "Gifts",
+      "amount": 48.03
+    }
+  ]
+}, {
+  "month": "Sep",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 794.41
+    },
+    {
+      "category": "Food",
+      "amount": 130.8
+    },
+    {
+      "category": "Clothing",
+      "amount": 77.65
+    },
+    {
+      "category": "Utilities",
+      "amount": 11.16
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 477.91
+    },
+    {
+      "category": "Dividends",
+      "amount": 370.11
+    },
+    {
+      "category": "Gifts",
+      "amount": 612.67
+    }
+  ]
+}, {
+  "month": "Oct",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 620.8
+    },
+    {
+      "category": "Food",
+      "amount": 840.13
+    },
+    {
+      "category": "Clothing",
+      "amount": 269.63
+    },
+    {
+      "category": "Utilities",
+      "amount": 71.34
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 965.33
+    },
+    {
+      "category": "Dividends",
+      "amount": 729.71
+    },
+    {
+      "category": "Gifts",
+      "amount": 642.04
+    }
+  ]
+}, {
+  "month": "Nov",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 720.82
+    },
+    {
+      "category": "Food",
+      "amount": 745.2
+    },
+    {
+      "category": "Clothing",
+      "amount": 444.57
+    },
+    {
+      "category": "Utilities",
+      "amount": 162.62
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 586.28
+    },
+    {
+      "category": "Dividends",
+      "amount": 281.18
+    },
+    {
+      "category": "Gifts",
+      "amount": 625.8
+    }
+  ]
+}, {
+  "month": "Dec",
+  "expenses": [
+    {
+      "category": "Rent",
+      "amount": 673.39
+    },
+    {
+      "category": "Food",
+      "amount": 648.72
+    },
+    {
+      "category": "Clothing",
+      "amount": 206.65
+    },
+    {
+      "category": "Utilities",
+      "amount": 777.91
+    }
+  ],
+  "revenues": [
+    {
+      "category": "Wages",
+      "amount": 621.25
+    },
+    {
+      "category": "Dividends",
+      "amount": 742.28
+    },
+    {
+      "category": "Gifts",
+      "amount": 428.84
+    }
+  ]
+}]
