@@ -5,7 +5,9 @@
     "lib": ["ES6", "DOM"],
     "strict": true,
     "jsx": "react",
-    "target": "ES5"
+    "target": "ES5",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": ["node_modules"],
   "include": ["src"]
