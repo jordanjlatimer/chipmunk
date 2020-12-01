@@ -62,14 +62,7 @@ module.exports = {
     }),
   ],
   devtool: "eval",
-  devServer: {
-    contentBase: path.join(__dirname, "dist"),
-    port: 3000,
-  },
   performance: {
-    hints: process.env.NODE_ENV === "production" ? "warning" : false
-  },
-  externals: {
-    moment: "moment"
+    hints: "warning"
   }
 };

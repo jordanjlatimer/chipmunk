@@ -4,6 +4,7 @@ import { MenuItem } from "./Components/Menu/MenuItem/MenuItem";
 import { RiCalendarTodoFill, RiHome4Line } from "@meronex/icons/ri"
 import { Module } from "./Components/Module/Module";
 import { Budget } from "./Components/Modules/Budget/Budget";
+import { Loader } from "simp-ui";
 
 const App: React.FC<any> = (props: any) => {
   const [curMod, setCurMod] = React.useState("home")
@@ -19,7 +20,7 @@ const App: React.FC<any> = (props: any) => {
     },
     home: {
       header: "Home",
-      component: "Home Stuff"
+      component: <div style={{height: "200px", width: "200px", margin: "100px auto"}}><Loader/></div>
     }
   }
 
