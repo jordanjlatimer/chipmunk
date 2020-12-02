@@ -12,9 +12,9 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".js"],
     alias: {
-      react: path.resolve("./node_modules/react"),
-      "react-dom": path.resolve("./node_modules/react-dom")
-    }
+      "react": path.resolve("./node_modules/react"),
+      "react-dom": path.resolve("./node_modules/react-dom"),
+    },
   },
   module: {
     rules: [
@@ -25,24 +25,24 @@ module.exports = {
           {
             loader: "ts-loader",
             options: {
-              transpileOnly: true
-            }
-          }
-        ]
+              transpileOnly: true,
+            },
+          },
+        ],
       },
       {
         test: /\.sass?$/,
         exclude: /node_modules/,
         use: [
-          { 
-            loader: "style-loader" 
-          }, 
-          { 
-            loader: "css-loader" 
-          }, 
-          { 
-            loader: "sass-loader" 
-          }
+          {
+            loader: "style-loader",
+          },
+          {
+            loader: "css-loader",
+          },
+          {
+            loader: "sass-loader",
+          },
         ],
       },
     ],
@@ -55,9 +55,9 @@ module.exports = {
     contentBase: path.join(__dirname, "dist"),
     port: 3000,
     hot: true,
-    noInfo: true
+    stats: "minimal",
   },
   performance: {
-    hints: false
-  }
+    hints: false,
+  },
 };

@@ -1,44 +1,46 @@
 import * as React from "react";
 import { Menu } from "./Components/Menu/Menu";
 import { MenuItem } from "./Components/Menu/MenuItem/MenuItem";
-import { RiCalendarTodoFill, RiHome4Line } from "@meronex/icons/ri"
+import { RiCalendarTodoFill, RiHome4Line } from "@meronex/icons/ri";
 import { Module } from "./Components/Module/Module";
 import { Budget } from "./Components/Modules/Budget/Budget";
 import { Loader } from "simp-ui";
 
 const App: React.FC<any> = (props: any) => {
-  const [curMod, setCurMod] = React.useState("home")
+  const [curMod, setCurMod] = React.useState("home");
 
   type modules = {
-    [key: string]: {header: string, component: React.ReactNode}
-  }
+    [key: string]: { header: string; component: React.ReactNode };
+  };
 
   const modules: modules = {
     budget: {
       header: "Budget",
-      component: <Budget/>
+      component: <Budget />,
     },
     home: {
       header: "Home",
-      component: <div style={{height: "200px", width: "200px", margin: "100px auto"}}><Loader/></div>
-    }
-  }
+      component: (
+        <div style={{ height: "200px", width: "200px", margin: "100px auto" }}>
+          <Loader />
+        </div>
+      ),
+    },
+  };
 
   return (
     <>
       <Menu>
         <MenuItem onClick={() => setCurMod("home")}>
-          <RiHome4Line/>
+          <RiHome4Line />
           Home
         </MenuItem>
         <MenuItem onClick={() => setCurMod("budget")}>
-          <RiCalendarTodoFill/>
+          <RiCalendarTodoFill />
           Budget
         </MenuItem>
       </Menu>
-      <Module header={modules[curMod].header}>
-        {modules[curMod].component}
-      </Module>
+      <Module header={modules[curMod].header}>{modules[curMod].component}</Module>
     </>
   );
 };
