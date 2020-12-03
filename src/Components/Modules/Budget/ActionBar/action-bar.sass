@@ -1,0 +1,21 @@
+@import "../../../../_globals"
+  
+.action-bar
+  display: flex
+  margin: 20px 0px 10px 0px
+
+  &-button
+    padding: 12px
+    margin-right: 10px
+    background-color: $positive
+    border-radius: 4px
+    box-shadow: $small-shadow
+    transition: $trans
+    cursor: pointer
+
+    &:hover
+      box-shadow: $med-shadow
+      transform: translate(-1px, -1px)
+
+    &:last-of-type
+      margin-right: 0px

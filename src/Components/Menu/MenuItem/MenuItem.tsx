@@ -2,13 +2,15 @@ import * as React from "react";
 import "./menu-item.sass";
 
 type MenuItemProps = {
-  children?: React.ReactNode;
-  onClick?: () => void;
+  icon: React.ReactNode,
+  label: string,
+  action: () => void;
 };
-const MenuItem: React.FC<MenuItemProps> = ({ children, onClick }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ icon, label, action }) => {
   return (
-    <div className="menu-item" onClick={onClick}>
-      {children}
+    <div className="menu-item" onClick={() => action()}>
+      {icon}
+      <div className="menu-item-label">{label}</div>
     </div>
   );
 };

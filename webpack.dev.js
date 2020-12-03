@@ -48,7 +48,7 @@ module.exports = {
     ],
   },
   optimization: {
-    minimize: true,
+    minimize: false,
   },
   devtool: "eval",
   devServer: {

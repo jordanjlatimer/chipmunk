@@ -1,18 +1,17 @@
 import * as React from "react";
-import { BudgetCard } from "./BudgetCard/BudgetCard";
-import "./budget.sass";
 import { LineGraph, Loader } from "simp-ui";
+import { Table } from "./Table/Table";
+import "./budget.sass";
+import { ModuleHeader } from "../../BaseComps/Headers/ModuleHeader/ModuleHeader";
 
 type dataFormat = {
   month: string;
   expenses: {
-    category: string;
-    amount: number | null;
-  }[];
-  revenues: {
-    category: string;
-    amount: number | null;
-  }[];
+    [key: string]: number
+   };
+   revenues: {
+    [key: string]: number
+   };
 }[];
 
 const Budget: React.FC<{}> = () => {
@@ -27,11 +26,13 @@ const Budget: React.FC<{}> = () => {
   }, []);
 
   return (
-    <>
-      <div className="budget-cards">
-        <div className="budget-cards-header">Monthly Expenses and Revenues</div>
-        <div className="budget-cards-items">
-          {data.length < 1 ? <Loader /> : data.map(month => <BudgetCard data={month} />)}
+    <div className="budget">
+      <ModuleHeader text="Budget" breadcrumbs={[{text: "Jimmy"}]} action={() => console.log("clicked")}/>
+      <div className="budget-overview">
+        <div className="budget-overview-header">Monthly Expenses and Revenues</div>
+        Click on a month to view a detailed breakdown.
+        <div className="budget-overview-table">
+          {data.length < 1 ? <Loader /> : <Table data={data}/>}
         </div>
       </div>
       <div className="budget-graph">
@@ -49,7 +50,7 @@ const Budget: React.FC<{}> = () => {
                   pointRadius: 2,
                 },
                 data: data.map(month => {
-                  return { x: month.month, y: month.revenues.reduce((a, b) => a + (b.amount ? b.amount : 0), 0) };
+                  return { x: month.month, y: Object.keys(month.revenues).reduce((a, b) => a + month.revenues[b], 0)};
                 }),
               },
               {
@@ -61,7 +62,7 @@ const Budget: React.FC<{}> = () => {
                   pointRadius: 2,
                 },
                 data: data.map(month => {
-                  return { x: month.month, y: month.expenses.reduce((a, b) => a + (b.amount ? b.amount : 0), 0) };
+                  return { x: month.month, y: Object.keys(month.expenses).reduce((a, b) => a + month.expenses[b], 0)};
                 }),
               },
             ]}
@@ -70,7 +71,7 @@ const Budget: React.FC<{}> = () => {
           />
         )}
       </div>
-    </>
+    </div>
   );
 };
 

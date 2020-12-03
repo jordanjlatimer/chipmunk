@@ -1,26 +1,24 @@
 @import "../../../globals"
   
 .budget
+  width: 100%
+  height: 100%
+  padding: 32px 32px 32px 232px
 
-  &-cards
+  &-overview
     padding: 1rem 0rem
-    display: flex
-    flex-wrap: wrap
 
     &-header
       font-size: 1.75rem
       flex-basis: 100%
       border-bottom: 1px solid $base-div
       padding-bottom: 0.25rem
+      margin-bottom: 20px
 
-    &-items
-      display: flex
-      flex-wrap: wrap
-      padding-top: 0.5rem
-      justify-content: center
-      align-items: center
-      min-height: 300px
+    &-table
+      overflow-x: auto
       width: 100%
+      min-height: 500px
 
   &-chart
     margin: 1rem auto
