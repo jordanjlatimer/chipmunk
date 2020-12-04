@@ -19,8 +19,8 @@ const Table: React.FC<TableProps> = ({data}) => {
     <table className="budget-table">
       <thead>
         <tr>
-          <th>Category</th>
-          {data.map(month => <th>{month.month}</th>)}
+          <th key="th">Category</th>
+          {data.map(month => <th key={month.month}>{month.month}</th>)}
         </tr>
       </thead>
       <tbody>
@@ -29,7 +29,7 @@ const Table: React.FC<TableProps> = ({data}) => {
         </tr>
         {Object.keys(data[0].revenues).map(revenueCategory => {
           return (
-            <tr>
+            <tr key={revenueCategory}>
               <td className="revenue-category">{revenueCategory.charAt(0).toUpperCase() + revenueCategory.slice(1)}</td>
               {data.map(month => {
                 return <td>${month.revenues[revenueCategory]}</td>
