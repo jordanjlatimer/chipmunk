@@ -1,7 +1,7 @@
 import * as React from "react";
-import { MenuItem } from "./MenuItem/MenuItem"
+import { MenuItem } from "./MenuItem"
 import { RiCalendarTodoFill, RiHome4Fill, RiSettings5Fill } from "@meronex/icons/ri";
-import "./menu.sass";
+import "../../styles/menu.sass";
 
 type MenuProps = {
   itemAction: (name: string) => void

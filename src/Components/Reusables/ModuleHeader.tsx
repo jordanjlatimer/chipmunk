@@ -1,6 +1,6 @@
 import { RiArrowRightSFill } from "@meronex/icons/ri"
 import * as React from "react"
-import "./module-header.sass"
+import "../../styles/module-header.sass"
 
 type ModuleHeaderProps = {
   text: string

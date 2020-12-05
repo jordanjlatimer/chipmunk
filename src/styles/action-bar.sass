@@ -1,13 +1,14 @@
-@import "../../../../_globals"
+@import "./_globals"
   
 .action-bar
   display: flex
+  width: 100%
   margin: 20px 0px 10px 0px
 
   &-button
     padding: 12px
     margin-right: 10px
-    background-color: $positive
+    background-color: $base
     border-radius: 4px
     box-shadow: $small-shadow
     transition: $trans
@@ -17,5 +18,14 @@
       box-shadow: $med-shadow
       transform: translate(-1px, -1px)
 
-    &:last-of-type
-      margin-right: 0px
+    &.negative
+      background-color: $base-red
+
+    &.print
+      margin-left: auto
+      background-color: $base-blue
+      display: flex
+      align-content: center
+
+      svg
+        margin-right: 8px

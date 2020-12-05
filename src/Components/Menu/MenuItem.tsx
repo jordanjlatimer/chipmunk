@@ -1,5 +1,5 @@
 import * as React from "react";
-import "./menu-item.sass";
+import "../../styles/menu-item.sass";
 
 type MenuItemProps = {
   icon: React.ReactNode,
