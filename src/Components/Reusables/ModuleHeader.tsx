@@ -1,21 +1,21 @@
-import { RiArrowRightSFill } from "@meronex/icons/ri"
-import * as React from "react"
-import "../../styles/module-header.sass"
+import { RiArrowRightSFill } from "@meronex/icons/ri";
+import * as React from "react";
+import "../../styles/module-header.sass";
 
 type ModuleHeaderProps = {
-  text: string
-  action?: () => void
+  text: string;
+  action?: () => void;
   breadcrumbs?: {
-    text: string,
-    action?: () => void
-  }[]
-  borderBottom?: boolean
-}
+    text: string;
+    action?: () => void;
+  }[];
+  borderBottom?: boolean;
+};
 
-const ModuleHeader: React.FC<ModuleHeaderProps> = ({text, action, borderBottom = true, breadcrumbs }) => {
+const ModuleHeader: React.FC<ModuleHeaderProps> = ({ text, action, borderBottom = true, breadcrumbs }) => {
   return (
     <div className={"module-header" + (borderBottom ? " border-bottom" : "")}>
-      <span 
+      <span
         onClick={action ? () => action() : undefined}
         className={"module-header-main" + (action ? " clickable" : "")}
         key="text"
@@ -23,22 +23,22 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({text, action, borderBottom =
         {text}
       </span>
       {breadcrumbs?.map(breadcrumb => {
-        const action = breadcrumb.action
-        return(
-          <span 
+        const action = breadcrumb.action;
+        return (
+          <span
             onClick={action ? () => action() : undefined}
             className={"module-header-breadcrumb" + (action ? " clickable" : "")}
             key={breadcrumb.text}
           >
-            {<RiArrowRightSFill/>}
+            {<RiArrowRightSFill />}
             {breadcrumb.text}
           </span>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-ModuleHeader.displayName = "ModuleHeader"
+ModuleHeader.displayName = "ModuleHeader";
 
-export { ModuleHeader }
+export { ModuleHeader };

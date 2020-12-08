@@ -13,12 +13,12 @@ const App: React.FC<any> = (props: any) => {
   const modules: modules = {
     budget: <Budget />,
     home: "Home",
-    settings: "Settings"
+    settings: "Settings",
   };
 
   return (
     <>
-      <Menu itemAction={setCurMod}/>
+      <Menu itemAction={setCurMod} />
       {modules[curMod]}
     </>
   );

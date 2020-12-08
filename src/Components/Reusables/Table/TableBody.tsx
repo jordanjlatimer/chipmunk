@@ -1,13 +1,9 @@
-import * as React from "react"
+import * as React from "react";
 
-const TableBody: React.FC<{}> = ({children}) => {
-  return(
-    <tbody>
-      {children}
-    </tbody>
-  )
-}
+const TableBody: React.FC<{}> = ({ children }) => {
+  return <tbody>{children}</tbody>;
+};
 
-TableBody.displayName = "TableBody"
+TableBody.displayName = "TableBody";
 
-export { TableBody }
+export { TableBody };

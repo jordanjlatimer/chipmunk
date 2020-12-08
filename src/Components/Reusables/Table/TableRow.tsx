@@ -1,17 +1,13 @@
-import * as React from "react"
+import * as React from "react";
 
 type TableRowProps = {
-  bold?: boolean
-}
+  bold?: boolean;
+};
 
-const TableRow: React.FC<TableRowProps> = ({children, bold}) => {
-  return(
-    <tr className={bold ? "table-row-bold" : ""}>
-      {children}
-    </tr>
-  )
-}
+const TableRow: React.FC<TableRowProps> = ({ children, bold }) => {
+  return <tr className={bold ? "table-row-bold" : ""}>{children}</tr>;
+};
 
-TableRow.displayName = "TableRow"
+TableRow.displayName = "TableRow";
 
-export { TableRow }
+export { TableRow };

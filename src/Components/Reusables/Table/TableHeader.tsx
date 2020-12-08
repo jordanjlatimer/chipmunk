@@ -1,15 +1,13 @@
-import * as React from "react"
+import * as React from "react";
 
-const TableHeader: React.FC<{}> = ({children}) => {
+const TableHeader: React.FC<{}> = ({ children }) => {
   return (
     <thead>
-      <tr>
-        {children}
-      </tr>
+      <tr>{children}</tr>
     </thead>
-  )
-}
+  );
+};
 
-TableHeader.displayName = "TableHeader"
+TableHeader.displayName = "TableHeader";
 
-export { TableHeader }
+export { TableHeader };

@@ -14,7 +14,7 @@ module.exports = {
     alias: {
       "react": path.resolve("./node_modules/react"),
       "react-dom": path.resolve("./node_modules/react-dom"),
-    },
+    }
   },
   module: {
     rules: [
@@ -32,7 +32,6 @@ module.exports = {
       },
       {
         test: /\.sass?$/,
-        exclude: /node_modules/,
         use: [
           {
             loader: "style-loader",
