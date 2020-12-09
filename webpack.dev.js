@@ -32,6 +32,7 @@ module.exports = {
       },
       {
         test: /\.sass?$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: "style-loader",

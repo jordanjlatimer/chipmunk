@@ -1,16 +1,16 @@
 import * as React from "react";
 import { ModuleHeader } from "../../Reusables/ModuleHeader";
 import { Overview } from "./Submodules/Overview";
-import { Breakdown } from "./Submodules/Breakdown";
+import { Breakdown } from "./Submodules/Breakdown/Breakdown";
 import "../../../styles/budget.sass";
-import { AddRevenue } from "./Submodules/AddRevenue";
+import { Notice } from "simp-ui";
 
 type dataFormat = {
   month: string;
   expenses: {
     [key: string]: number;
   };
-  revenues: {
+  incomes: {
     [key: string]: number;
   };
 }[];
@@ -20,10 +20,23 @@ const Budget: React.FC<{}> = () => {
     name: string;
     month: string;
     year: number | undefined;
-  }>({ name: "add-revenue", month: "Dec", year: 2020 });
+  }>({ name: "breakdown", month: "Dec", year: 2020 });
+  const [notice, setNotice] = React.useState({mount: false, message: ""})
+
+  React.useEffect(() => {
+    if (notice.mount){
+      window.setTimeout(() => setNotice({...notice, mount: false}), 4500)
+    }
+  }, [notice])
 
   return (
     <div className="budget">
+      {
+        notice.mount ?
+          <Notice text={notice.message}/>
+          :
+          null
+      }
       <ModuleHeader
         text="Budget"
         action={
@@ -32,12 +45,6 @@ const Budget: React.FC<{}> = () => {
         breadcrumbs={
           subMod.name === "breakdown" ? 
           [{ text: subMod.month + ", " + subMod.year }] 
-          : 
-          subMod.name === "add-expense" ?
-          [{text: subMod.month + ", " + subMod.year, action: () => setSubMod({...subMod, name: "breakdown"})}, {text: "Budget an Expense"}]
-          :
-          subMod.name === "add-revenue" ?
-          [{text: subMod.month + ", " + subMod.year, action: () => setSubMod({...subMod, name: "breakdown"})}, {text: "Budget a Revenue"}]
           :
           undefined
         }
@@ -47,9 +54,14 @@ const Budget: React.FC<{}> = () => {
           headerAction={(value: { month: string; year: number }) => setSubMod({ ...value, name: "breakdown" })}
         />
       )}
-      {subMod.name === "breakdown" && <Breakdown month={subMod.month} year={2020} buttonAction={(value: string) => setSubMod({...subMod, name: value})}/>}
-      {subMod.name === "add-revenue" && <AddRevenue/>}
-      {subMod.name === "add-expense" && "Budget an Expense"}
+      {
+        subMod.name === "breakdown" && 
+        <Breakdown 
+          noticeCallback={(value: string) => setNotice({mount: true, message: value})}
+          month={subMod.month} 
+          year={2020}
+        />
+      }
     </div>
   );
 };

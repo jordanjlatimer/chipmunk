@@ -1,13 +1,14 @@
 import * as React from "react";
-import { Loader } from "simp-ui";
-import { Table } from "../../../Reusables/Table/Table";
-import { TableBody } from "../../../Reusables/Table/TableBody";
-import { TableCell } from "../../../Reusables/Table/TableCell";
-import { TableHeader } from "../../../Reusables/Table/TableHeader";
-import { TableRow } from "../../../Reusables/Table/TableRow";
-import "../../../../styles/breakdown.sass";
-import { Button } from "../../../Reusables/Button";
+import { Loader, Modal, Button } from "simp-ui";
+import { Table } from "../../../../Reusables/Table/Table";
+import { TableBody } from "../../../../Reusables/Table/TableBody";
+import { TableCell } from "../../../../Reusables/Table/TableCell";
+import { TableHeader } from "../../../../Reusables/Table/TableHeader";
+import { TableRow } from "../../../../Reusables/Table/TableRow";
+import "../../../../../styles/breakdown.sass";
 import { RiPrinterFill } from "@meronex/icons/ri";
+import { AddIncome } from "./AddIncome";
+import { AddExpense } from "./AddExpense";
 
 type dataFormat =
   | {
@@ -19,7 +20,7 @@ type dataFormat =
           };
         };
       };
-      revenues: {
+      incomes: {
         [key: string]: {
           [key: string]: {
             amount: number;
@@ -33,17 +34,19 @@ type dataFormat =
 type BreakdownProps = {
   month: string;
   year: string | number;
-  buttonAction: (value: string) => void
+  buttonAction?: (value: string) => void
+  noticeCallback: (value: string) => void
 };
 
-const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
+const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction, noticeCallback }) => {
   const [data, setData] = React.useState<dataFormat>(undefined);
+  const [modalProps, setModalProps] = React.useState({open: false, contents: ""})
 
   React.useEffect(() => {
     fetch("https://my.api.mockaroo.com/chipmunk-month-breakdown.json?key=b1b7fe80")
       .then(response => response.json())
       .then(json => {
-        setData(json);
+        setData(undefined);
       });
   }, []);
 
@@ -55,22 +58,23 @@ const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
           expenses += data.expenses[key][key2]["amount"];
         }
       }
-      let revenues = 0;
-      for (const key in data.revenues) {
-        for (const key2 in data.revenues[key]) {
-          revenues += data.revenues[key][key2]["amount"];
+      let incomes = 0;
+      for (const key in data.incomes) {
+        for (const key2 in data.incomes[key]) {
+          incomes += data.incomes[key][key2]["amount"];
         }
       }
-      return revenues > expenses ? "$" + (revenues - expenses) : "($" + Math.abs(revenues - expenses) + ")";
+      return incomes > expenses ? "$" + (incomes - expenses) : "($" + Math.abs(incomes - expenses) + ")";
     }
   };
 
   return (
     <div className="budget-breakdown">
       <div className="budget-breakdown-header">{"Breakdown - " + month + ", " + year + " Budget"}</div>
+      <div>Here you can edit the month's budget.</div>
       <div className="budget-breakdown-actionbar">
-        <Button marginRight color="green" text="Budget an Income" onClick={() => buttonAction("add-revenue")}/>
-        <Button color="red" text="Budget an Expense" onClick={() => buttonAction("add-expense")}/>
+        <Button marginRight color="green" text="Add an Income" onClick={() => setModalProps({open: true, contents: "add-income"})}/>
+        <Button color="red" text="Add an Expense" onClick={() => setModalProps({open: true, contents: "add-expense"})}/>
         <Button color="blue" text="Print" icon={<RiPrinterFill/>} floatRight/>
       </div>
       <div className="budget-breakdown-table">
@@ -84,10 +88,10 @@ const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
             <TableBody>
               <TableRow>
                 <TableCell group="positive" colspan={3}>
-                  Revenues
+                  Incomes
                 </TableCell>
               </TableRow>
-              {Object.keys(data.revenues).map(key1 => {
+              {Object.keys(data.incomes).map(key1 => {
                 return (
                   <React.Fragment key={key1}>
                     <TableRow>
@@ -95,14 +99,14 @@ const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
                         {key1.charAt(0).toUpperCase() + key1.slice(1)}
                       </TableCell>
                     </TableRow>
-                    {Object.keys(data.revenues[key1]).map(key2 => {
+                    {Object.keys(data.incomes[key1]).map(key2 => {
                       return (
                         <TableRow key={key2}>
                           <TableCell group="positive" indent={2}>
                             {key2.charAt(0).toUpperCase() + key2.slice(1)}
                           </TableCell>
-                          <TableCell>{"$" + data.revenues[key1][key2]["amount"]}</TableCell>
-                          <TableCell>{data.revenues[key1][key2]["note"]}</TableCell>
+                          <TableCell>{"$" + data.incomes[key1][key2]["amount"]}</TableCell>
+                          <TableCell>{data.incomes[key1][key2]["note"]}</TableCell>
                         </TableRow>
                       );
                     })}
@@ -146,6 +150,10 @@ const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
           <Loader />
         )}
       </div>
+      <Modal open={modalProps.open} callback={() => setModalProps({...modalProps, open: false})}>
+        {modalProps.contents === "add-income" && <AddIncome noticeCallback={noticeCallback} modalCallback={() => setModalProps({...modalProps, open: false})}/>}
+        {modalProps.contents === "add-expense" && <AddExpense/>}
+      </Modal>
     </div>
   );
 };

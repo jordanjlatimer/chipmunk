@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Menu } from "./Components/Menu/Menu";
 import { Budget } from "./Components/Modules/Budget/Budget";
-import { Loader } from "simp-ui";
+import "./styles/app.sass"
 
 const App: React.FC<any> = (props: any) => {
   const [curMod, setCurMod] = React.useState("budget");
@@ -19,7 +19,9 @@ const App: React.FC<any> = (props: any) => {
   return (
     <>
       <Menu itemAction={setCurMod} />
-      {modules[curMod]}
+      <div className="module-container">
+        {modules[curMod]}
+      </div>
     </>
   );
 };

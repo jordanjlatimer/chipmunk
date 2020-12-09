@@ -13,7 +13,7 @@ type dataFormat = {
   expenses: {
     [key: string]: number;
   };
-  revenues: {
+  incomes: {
     [key: string]: number;
   };
 }[];
@@ -26,7 +26,7 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
   const [data, setData] = React.useState<dataFormat>([]);
 
   React.useEffect(() => {
-    fetch("https://my.api.mockaroo.com/chipmunk-monthly-expenses-and-revenues.json?key=b1b7fe80")
+    fetch("https://my.api.mockaroo.com/chipmunk-monthly-expenses-and-incomes.json?key=b1b7fe80")
       .then(response => response.json())
       .then(json => {
         setData(json);
@@ -35,7 +35,7 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
 
   return (
     <div className="budget-overview">
-      <div className="budget-overview-header">Monthly Expenses and Revenues</div>
+      <div className="budget-overview-header">Monthly Expenses and Incomes</div>
       <div>Click on a column header to view a detailed breakdown.</div>
       <div className="budget-overview-table">
         {data.length < 1 ? (
@@ -58,17 +58,17 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
             <TableBody>
               <TableRow>
                 <TableCell group="positive" colspan={data.length + 1}>
-                  Revenues
+                  Incomes
                 </TableCell>
               </TableRow>
-              {Object.keys(data[0].revenues).map(revenueCategory => {
+              {Object.keys(data[0].incomes).map(incomeCategory => {
                 return (
-                  <TableRow key={revenueCategory}>
+                  <TableRow key={incomeCategory}>
                     <TableCell group="positive" indent={1}>
-                      {revenueCategory.charAt(0).toUpperCase() + revenueCategory.slice(1)}
+                      {incomeCategory.charAt(0).toUpperCase() + incomeCategory.slice(1)}
                     </TableCell>
                     {data.map((month, i) => {
-                      return <TableCell key={"td" + i}>${month.revenues[revenueCategory]}</TableCell>;
+                      return <TableCell key={"td" + i}>${month.incomes[incomeCategory]}</TableCell>;
                     })}
                   </TableRow>
                 );
@@ -101,11 +101,11 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
                 </TableCell>
                 {data.map((month, i) => {
                   const expenses = Object.keys(month.expenses).reduce((a, b) => a + month.expenses[b], 0);
-                  const revenues = Object.keys(month.revenues).reduce((a, b) => a + month.revenues[b], 0);
+                  const incomes = Object.keys(month.incomes).reduce((a, b) => a + month.incomes[b], 0);
                   return (
                     <TableCell key={"td" + i}>
-                      {expenses > revenues ? "(" : ""}${Math.abs(revenues - expenses)}
-                      {expenses > revenues ? ")" : ""}
+                      {expenses > incomes ? "(" : ""}${Math.abs(incomes - expenses)}
+                      {expenses > incomes ? ")" : ""}
                     </TableCell>
                   );
                 })}
@@ -119,7 +119,7 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
           <LineGraph
             lines={[
               {
-                label: "Revenues",
+                label: "Incomes",
                 options: {
                   lineColor: "green",
                   lineWidth: 2,
@@ -127,7 +127,7 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
                   pointRadius: 2,
                 },
                 data: data.map(month => {
-                  return { x: month.month, y: Object.keys(month.revenues).reduce((a, b) => a + month.revenues[b], 0) };
+                  return { x: month.month, y: Object.keys(month.incomes).reduce((a, b) => a + month.incomes[b], 0) };
                 }),
               },
               {
