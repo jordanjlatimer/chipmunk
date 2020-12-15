@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
   mode: "production",
@@ -50,6 +51,7 @@ module.exports = {
   },
   optimization: {
     minimize: true,
+    mangleExports: "size"
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -60,8 +62,8 @@ module.exports = {
       reportFilename: "../dev/report.html",
       openAnalyzer: false,
     }),
+    new CompressionPlugin(),
   ],
-  devtool: "eval",
   performance: {
     hints: "warning",
   },

@@ -15,6 +15,7 @@
   "devDependencies": {
     "@types/react": "^16.9.55",
     "@types/react-dom": "^16.9.9",
+    "compression-webpack-plugin": "^7.0.0",
     "css-loader": "^5.0.1",
     "html-webpack-plugin": "^4.5.0",
     "prettier": "^2.1.2",
