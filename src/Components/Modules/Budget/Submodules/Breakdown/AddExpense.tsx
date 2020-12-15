@@ -1,7 +1,12 @@
 import * as React from "react"
-import { Button, Container, Divider, Dropdown, Input, Modal, TextArea } from "simp-ui"
+import { Button, Container, Divider, Dropdown, Input, TextArea } from "simp-ui"
 
-const AddExpense: React.FC<{}> = () => {
+type AddExpenseProps = {
+  noticeCallback: (value: string) => void
+  modalCallback: () => void
+}
+
+const AddExpense: React.FC<AddExpenseProps> = ({noticeCallback, modalCallback}) => {
   return (
     <Container header="Add an Expense">
       <Container flex>
@@ -12,8 +17,15 @@ const AddExpense: React.FC<{}> = () => {
       <TextArea label="Note (optional)" width="long"/>
       <Divider margin="large"/>
       <Container flex>
-        <Button text="Add" marginRight/>
-        <Button text="Cancel" color="red"/>
+        <Button 
+          text="Add" 
+          marginRight
+          onClick={() => {
+            noticeCallback("Expense successfully added.")
+            modalCallback()
+          }}
+        />
+        <Button text="Cancel" color="red" onClick={modalCallback}/>
       </Container>
     </Container>
   )

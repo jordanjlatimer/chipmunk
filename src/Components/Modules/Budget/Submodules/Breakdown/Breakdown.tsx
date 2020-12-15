@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Loader, Modal, Button } from "simp-ui";
+import { Loader, Modal, Button, Notice } from "simp-ui";
 import { Table } from "../../../../Reusables/Table/Table";
 import { TableBody } from "../../../../Reusables/Table/TableBody";
 import { TableCell } from "../../../../Reusables/Table/TableCell";
@@ -35,18 +35,24 @@ type BreakdownProps = {
   month: string;
   year: string | number;
   buttonAction?: (value: string) => void
-  noticeCallback: (value: string) => void
 };
 
-const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction, noticeCallback }) => {
+const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
   const [data, setData] = React.useState<dataFormat>(undefined);
   const [modalProps, setModalProps] = React.useState({open: false, contents: ""})
+  const [notice, setNotice] = React.useState({mount: false, message: ""})
+
+  React.useEffect(() => {
+    if (notice.mount){
+      window.setTimeout(() => setNotice({...notice, mount: false}), 4500)
+    }
+  }, [notice])
 
   React.useEffect(() => {
     fetch("https://my.api.mockaroo.com/chipmunk-month-breakdown.json?key=b1b7fe80")
       .then(response => response.json())
       .then(json => {
-        setData(undefined);
+        setData(json);
       });
   }, []);
 
@@ -70,6 +76,12 @@ const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction, notice
 
   return (
     <div className="budget-breakdown">
+      {
+        notice.mount ?
+          <Notice text={notice.message} position={{left: "200px"}}/>
+          :
+          null
+      }
       <div className="budget-breakdown-header">{"Breakdown - " + month + ", " + year + " Budget"}</div>
       <div>Here you can edit the month's budget.</div>
       <div className="budget-breakdown-actionbar">
@@ -150,9 +162,21 @@ const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction, notice
           <Loader />
         )}
       </div>
-      <Modal open={modalProps.open} callback={() => setModalProps({...modalProps, open: false})}>
-        {modalProps.contents === "add-income" && <AddIncome noticeCallback={noticeCallback} modalCallback={() => setModalProps({...modalProps, open: false})}/>}
-        {modalProps.contents === "add-expense" && <AddExpense/>}
+      <Modal position={{left: "200px"}} open={modalProps.open}>
+        {
+          modalProps.contents === "add-income" && 
+            <AddIncome 
+              noticeCallback={(value: string) => setNotice({mount: true, message: value})}
+              modalCallback={() => setModalProps({...modalProps, open: false})}
+            />
+        }
+        {
+          modalProps.contents === "add-expense" && 
+            <AddExpense 
+              noticeCallback={(value: string) => setNotice({mount: true, message: value})}
+              modalCallback={() => setModalProps({...modalProps, open: false})}
+            />
+        }
       </Modal>
     </div>
   );

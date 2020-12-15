@@ -1,32 +1,7 @@
 @import "./globals"
   
 .budget
-  transform: translateX(0px) //So that modal will use it as its containing block
   padding: 32px
-  height: 100%
-  
-  &-overview
-    padding: 1rem 0rem
-
-    &-header
-      font-size: 1.75rem
-      flex-basis: 100%
-      border-bottom: 1px solid $base-div
-      padding-bottom: 0.25rem
-      margin-bottom: 20px
-
-    &-table
-      overflow-x: auto
-      width: 100%
-      min-height: 500px
-
-  &-chart
-    margin: 1rem auto
-    width: 90%
-    height: 400px
-    border: 1px solid $base-dark
-    box-shadow: $small-shadow
-
-  &-graph
-    height: 500px
-    margin-top: 20px
+  width: 100%
+  height: auto //Instead of height 100%, because height 100% will only be initial height of viewport as parent has overflowy: auto
+  transform: translateX(0px) //So that modal will be relative to this container.

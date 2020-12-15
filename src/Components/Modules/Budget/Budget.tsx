@@ -3,17 +3,6 @@ import { ModuleHeader } from "../../Reusables/ModuleHeader";
 import { Overview } from "./Submodules/Overview";
 import { Breakdown } from "./Submodules/Breakdown/Breakdown";
 import "../../../styles/budget.sass";
-import { Notice } from "simp-ui";
-
-type dataFormat = {
-  month: string;
-  expenses: {
-    [key: string]: number;
-  };
-  incomes: {
-    [key: string]: number;
-  };
-}[];
 
 const Budget: React.FC<{}> = () => {
   const [subMod, setSubMod] = React.useState<{
@@ -21,22 +10,9 @@ const Budget: React.FC<{}> = () => {
     month: string;
     year: number | undefined;
   }>({ name: "breakdown", month: "Dec", year: 2020 });
-  const [notice, setNotice] = React.useState({mount: false, message: ""})
-
-  React.useEffect(() => {
-    if (notice.mount){
-      window.setTimeout(() => setNotice({...notice, mount: false}), 4500)
-    }
-  }, [notice])
 
   return (
     <div className="budget">
-      {
-        notice.mount ?
-          <Notice text={notice.message}/>
-          :
-          null
-      }
       <ModuleHeader
         text="Budget"
         action={
@@ -57,7 +33,6 @@ const Budget: React.FC<{}> = () => {
       {
         subMod.name === "breakdown" && 
         <Breakdown 
-          noticeCallback={(value: string) => setNotice({mount: true, message: value})}
           month={subMod.month} 
           year={2020}
         />

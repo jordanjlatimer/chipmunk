@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Modal } from "simp-ui";
 import { Menu } from "./Components/Menu/Menu";
 import { Budget } from "./Components/Modules/Budget/Budget";
 import "./styles/app.sass"
