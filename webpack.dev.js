@@ -3,24 +3,24 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index.tsx",
+  entry: {
+    index: "./src/index.tsx",
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
-    library: "umd",
   },
   resolve: {
     extensions: [".tsx", ".js"],
     alias: {
-      "react": path.resolve("./node_modules/react"),
-      "react-dom": path.resolve("./node_modules/react-dom"),
-    }
+      "react": path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+    },
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        exclude: /node_modules/,
         use: [
           {
             loader: "ts-loader",
@@ -32,18 +32,7 @@ module.exports = {
       },
       {
         test: /\.sass?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "style-loader",
-          },
-          {
-            loader: "css-loader",
-          },
-          {
-            loader: "sass-loader",
-          },
-        ],
+        use: ["style-loader", "css-loader", "sass-loader"],
       },
     ],
   },
@@ -53,11 +42,19 @@ module.exports = {
   devtool: "eval",
   devServer: {
     contentBase: path.join(__dirname, "dist"),
+    host: "0.0.0.0",
     port: 3000,
     hot: true,
+    open: true,
     stats: "minimal",
   },
   performance: {
     hints: false,
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "src/index.html"),
+      filename: "index.html",
+    }),
+  ],
 };

@@ -1,28 +1,30 @@
 const path = require("path");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const MiniCssWebpackPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
   mode: "production",
-  entry: "./src/index.tsx",
+  entry: {
+    index: "./src/index.tsx", //Needs the key "index" to have a name.
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
-    library: "umd",
   },
   resolve: {
     extensions: [".tsx", ".js"],
     alias: {
-      "react": path.resolve("./node_modules/react"),
-      "react-dom": path.resolve("./node_modules/react-dom"),
+      "react": path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
     },
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        exclude: /node_modules/,
         use: [
           {
             loader: "ts-loader",
@@ -34,35 +36,25 @@ module.exports = {
       },
       {
         test: /\.sass?$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "style-loader",
-          },
-          {
-            loader: "css-loader",
-          },
-          {
-            loader: "sass-loader",
-          },
-        ],
+        use: [MiniCssWebpackPlugin.loader, "css-loader", "sass-loader"],
       },
     ],
   },
   optimization: {
     minimize: true,
-    mangleExports: "size"
+    mangleExports: "size",
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-      template: "src/index.html",
+      template: path.resolve(__dirname, "src/index.html"),
+      filename: "index.html",
     }),
+    new MiniCssWebpackPlugin(),
+    new CompressionPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: "static",
-      reportFilename: "../dev/report.html",
-      openAnalyzer: false,
     }),
-    new CompressionPlugin(),
   ],
   performance: {
     hints: "warning",

@@ -1,11 +1,6 @@
 import * as React from "react";
-import { LineGraph, Loader } from "simp-ui";
-import { Table } from "../../../Reusables/Table/Table";
-import { TableBody } from "../../../Reusables/Table/TableBody";
-import { TableCell } from "../../../Reusables/Table/TableCell";
-import { TableHeader } from "../../../Reusables/Table/TableHeader";
-import { TableRow } from "../../../Reusables/Table/TableRow";
-import "../../../../styles/overview.sass";
+import { LineGraph, Loader, Table, TableBody, TableCell, TableHeader, TableRow } from "simp-ui";
+import "../styles/overview.sass";
 
 type dataFormat = {
   year: number;
@@ -22,7 +17,7 @@ type OverviewProps = {
   headerAction: (value: { month: string; year: number }) => void;
 };
 
-const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
+export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
   const [data, setData] = React.useState<dataFormat>([]);
 
   React.useEffect(() => {
@@ -151,7 +146,3 @@ const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
     </div>
   );
 };
-
-Overview.displayName = "Overview";
-
-export { Overview };

@@ -1,6 +1,5 @@
-import { RiArrowRightSFill } from "@meronex/icons/ri";
 import * as React from "react";
-import "../../styles/module-header.sass";
+import "../styles/module-header.sass";
 
 type ModuleHeaderProps = {
   text: string;
@@ -12,7 +11,7 @@ type ModuleHeaderProps = {
   borderBottom?: boolean;
 };
 
-const ModuleHeader: React.FC<ModuleHeaderProps> = ({ text, action, borderBottom = true, breadcrumbs }) => {
+export const ModuleHeader: React.FC<ModuleHeaderProps> = ({ text, action, borderBottom = true, breadcrumbs }) => {
   return (
     <div className={"module-header" + (borderBottom ? " border-bottom" : "")}>
       <span
@@ -30,7 +29,6 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({ text, action, borderBottom 
             className={"module-header-breadcrumb" + (action ? " clickable" : "")}
             key={breadcrumb.text}
           >
-            {<RiArrowRightSFill />}
             {breadcrumb.text}
           </span>
         );
@@ -38,7 +36,3 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({ text, action, borderBottom 
     </div>
   );
 };
-
-ModuleHeader.displayName = "ModuleHeader";
-
-export { ModuleHeader };

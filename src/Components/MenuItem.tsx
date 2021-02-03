@@ -1,12 +1,12 @@
 import * as React from "react";
-import "../../styles/menu-item.sass";
+import "../styles/menu-item.sass";
 
 type MenuItemProps = {
   icon: React.ReactNode;
   label: string;
   action: () => void;
 };
-const MenuItem: React.FC<MenuItemProps> = ({ icon, label, action }) => {
+export const MenuItem: React.FC<MenuItemProps> = ({ icon, label, action }) => {
   return (
     <div className="menu-item" onClick={() => action()}>
       {icon}
@@ -14,7 +14,3 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, label, action }) => {
     </div>
   );
 };
-
-MenuItem.displayName = "MenuItem";
-
-export { MenuItem };
