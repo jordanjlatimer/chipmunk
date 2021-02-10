@@ -1,77 +1,52 @@
 import * as React from "react";
 import { Loader, Modal, Button, Notice, Table, TableBody, TableCell, TableHeader, TableRow } from "simp-ui";
+import { RiPrinterFill } from "@meronex/icons/ri";
 import "../styles/breakdown.sass";
 import { AddIncome } from "./AddIncome";
 import { AddExpense } from "./AddExpense";
-
-type dataFormat =
-  | {
-      expenses: {
-        [key: string]: {
-          [key: string]: {
-            amount: number;
-            note: string;
-          };
-        };
-      };
-      incomes: {
-        [key: string]: {
-          [key: string]: {
-            amount: number;
-            note: string;
-          };
-        };
-      };
-    }
-  | undefined;
+import { AppDataContext } from "./AppDataContext";
 
 type BreakdownProps = {
-  month: string;
-  year: string | number;
+  month: number;
+  year: number;
   buttonAction?: (value: string) => void;
 };
 
 export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
-  const [data, setData] = React.useState<dataFormat>(undefined);
+  const data = React.useContext(AppDataContext)?.data;
   const [modalProps, setModalProps] = React.useState({ open: false, contents: "" });
-  const [notice, setNotice] = React.useState({ mount: false, message: "" });
+  const [notice, setNotice] = React.useState({ mounted: false, message: "" });
+
+  const currentTimeframe = data?.timeframes.filter(
+    timeframe => timeframe.year === year && timeframe.month === month
+  )[0];
 
   React.useEffect(() => {
-    if (notice.mount) {
-      window.setTimeout(() => setNotice({ ...notice, mount: false }), 4500);
+    if (notice.mounted) {
+      window.setTimeout(() => setNotice({ ...notice, mounted: false }), 4500);
     }
   }, [notice]);
 
-  React.useEffect(() => {
-    fetch("https://my.api.mockaroo.com/chipmunk-month-breakdown.json?key=b1b7fe80")
-      .then(response => response.json())
-      .then(json => {
-        setData(json);
-      });
-  }, []);
-
-  const totalAmounts = () => {
-    if (data) {
-      let expenses = 0;
-      for (const key in data.expenses) {
-        for (const key2 in data.expenses[key]) {
-          expenses += data.expenses[key][key2]["amount"];
-        }
-      }
-      let incomes = 0;
-      for (const key in data.incomes) {
-        for (const key2 in data.incomes[key]) {
-          incomes += data.incomes[key][key2]["amount"];
-        }
-      }
-      return incomes > expenses ? "$" + (incomes - expenses) : "($" + Math.abs(incomes - expenses) + ")";
-    }
+  const formatAmounts = (value: number | undefined, isTotal: boolean) => {
+    return !value
+      ? "$0"
+      : value > 0
+      ? "$" + Math.abs(value)
+      : isTotal
+      ? "($" + Math.abs(value) + ")"
+      : "$" + Math.abs(value);
   };
 
   return (
     <div className="budget-breakdown">
-      {notice.mount ? <Notice text={notice.message} position={{ left: "200px" }} /> : null}
-      <div className="budget-breakdown-header">{"Breakdown - " + month + ", " + year + " Budget"}</div>
+      {notice.mounted ? <Notice text={notice.message} position={{ left: "200px" }} /> : null}
+      <div className="budget-breakdown-header">
+        {"Breakdown - " +
+          new Date(year, month).toLocaleDateString("default", { month: "short" }) +
+          ", " +
+          year +
+          " Budget"}
+      </div>
       <div>Here you can edit the month's budget.</div>
       <div className="budget-breakdown-actionbar">
         <Button
@@ -85,7 +60,7 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
           text="Add an Expense"
           onClick={() => setModalProps({ open: true, contents: "add-expense" })}
         />
-        <Button color="blue" text="Print" icon={""} floatRight />
+        <Button color="blue" text="Print" icon={<RiPrinterFill />} floatRight />
       </div>
       <div className="budget-breakdown-table">
         {data ? (
@@ -96,63 +71,65 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
               <TableCell header>Notes (If Any)</TableCell>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell group="positive" colspan={3}>
-                  Incomes
-                </TableCell>
-              </TableRow>
-              {Object.keys(data.incomes).map(key1 => {
+              {(Object.keys(data.categories) as ("expenses" | "incomes")[]).map(category => {
+                const group = category === "incomes" ? "positive" : "negative";
                 return (
-                  <React.Fragment key={key1}>
-                    <TableRow>
-                      <TableCell group="positive" colspan={3} indent={1}>
-                        {key1.charAt(0).toUpperCase() + key1.slice(1)}
+                  <React.Fragment key={category}>
+                    <TableRow key={category}>
+                      <TableCell group={group} colspan={3}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
                       </TableCell>
                     </TableRow>
-                    {Object.keys(data.incomes[key1]).map(key2 => {
+                    {Object.keys(data.categories[category]).map(key => {
+                      const hasSubs = data.categories[category]?.[key].length > 0;
                       return (
-                        <TableRow key={key2}>
-                          <TableCell group="positive" indent={2}>
-                            {key2.charAt(0).toUpperCase() + key2.slice(1)}
-                          </TableCell>
-                          <TableCell>{"$" + data.incomes[key1][key2]["amount"]}</TableCell>
-                          <TableCell>{data.incomes[key1][key2]["note"]}</TableCell>
-                        </TableRow>
+                        <React.Fragment key={key}>
+                          <TableRow key={key}>
+                            <TableCell group={group} indent={1} colspan={hasSubs ? 3 : 1}>
+                              {key.charAt(0).toUpperCase() + key.slice(1)}
+                            </TableCell>
+                            {!hasSubs ? (
+                              <>
+                                <TableCell>
+                                  {currentTimeframe
+                                    ? formatAmounts(currentTimeframe.actual[category]?.[key]?.["amount"], false)
+                                    : "$0"}
+                                </TableCell>
+                                <TableCell>
+                                  {currentTimeframe && currentTimeframe.actual[category]?.[key]?.["note"]}
+                                </TableCell>
+                              </>
+                            ) : null}
+                          </TableRow>
+                          {hasSubs
+                            ? data.categories[category]?.[key].map(subcategory => {
+                                return (
+                                  <TableRow key={subcategory}>
+                                    <TableCell group={group} indent={2}>
+                                      {subcategory}
+                                    </TableCell>
+                                    <TableCell>
+                                      {formatAmounts(
+                                        currentTimeframe?.actual[category]?.[key]?.[subcategory]?.amount,
+                                        false
+                                      )}
+                                    </TableCell>
+                                    <TableCell>
+                                      {currentTimeframe?.actual[category]?.[key]?.[subcategory]?.note}
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })
+                            : null}
+                        </React.Fragment>
                       );
                     })}
                   </React.Fragment>
                 );
               })}
-              <TableRow>
-                <TableCell group="negative" colspan={3}>
-                  Expenses
-                </TableCell>
-              </TableRow>
-              {Object.keys(data.expenses).map(key1 => {
-                return (
-                  <React.Fragment key={key1}>
-                    <TableRow>
-                      <TableCell group="negative" colspan={3} indent={1}>
-                        {key1.charAt(0).toUpperCase() + key1.slice(1)}
-                      </TableCell>
-                    </TableRow>
-                    {Object.keys(data.expenses[key1]).map(key2 => {
-                      return (
-                        <TableRow key={key2}>
-                          <TableCell group="negative" indent={2}>
-                            {key2.charAt(0).toUpperCase() + key2.slice(1)}
-                          </TableCell>
-                          <TableCell>{"($" + data.expenses[key1][key2]["amount"] + ")"}</TableCell>
-                          <TableCell>{data.expenses[key1][key2]["note"]}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </React.Fragment>
-                );
-              })}
-              <TableRow>
+              <TableRow bold>
                 <TableCell group="total">Total</TableCell>
-                <TableCell colspan={2}>{totalAmounts()}</TableCell>
+                <TableCell colspan={2}>{formatAmounts(currentTimeframe?.actual.amount, true)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -163,13 +140,13 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
       <Modal position={{ left: "200px" }} open={modalProps.open}>
         {modalProps.contents === "add-income" && (
           <AddIncome
-            noticeCallback={(value: string) => setNotice({ mount: true, message: value })}
+            noticeCallback={(value: string) => setNotice({ mounted: true, message: value })}
             modalCallback={() => setModalProps({ ...modalProps, open: false })}
           />
         )}
         {modalProps.contents === "add-expense" && (
           <AddExpense
-            noticeCallback={(value: string) => setNotice({ mount: true, message: value })}
+            noticeCallback={(value: string) => setNotice({ mounted: true, message: value })}
             modalCallback={() => setModalProps({ ...modalProps, open: false })}
           />
         )}

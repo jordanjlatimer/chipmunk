@@ -1,31 +1,30 @@
 import * as React from "react";
-import { ModuleHeader } from "./ModuleHeader";
 import { Overview } from "./Overview";
 import { Breakdown } from "./Breakdown";
 import "../styles/budget.sass";
+import { Button } from "simp-ui";
+import { RiArrowLeftFill } from "@meronex/icons/ri";
 
 export const Budget: React.FC<{}> = () => {
   const [subMod, setSubMod] = React.useState<{
     name: string;
-    month: string;
+    month: number | undefined;
     year: number | undefined;
-  }>({ name: "breakdown", month: "Dec", year: 2020 });
+  }>({ name: "overview", month: undefined, year: undefined });
 
   return (
     <div className="budget">
-      <ModuleHeader
-        text="Budget"
-        action={
-          subMod.name === "overview" ? undefined : () => setSubMod({ name: "overview", month: "", year: undefined })
-        }
-        breadcrumbs={subMod.name === "breakdown" ? [{ text: subMod.month + ", " + subMod.year }] : undefined}
-      />
       {subMod.name === "overview" && (
         <Overview
-          headerAction={(value: { month: string; year: number }) => setSubMod({ ...value, name: "breakdown" })}
+          headerAction={(value: { month: number; year: number }) => setSubMod({ ...value, name: "breakdown" })}
         />
       )}
-      {subMod.name === "breakdown" && <Breakdown month={subMod.month} year={2020} />}
+      {subMod.name === "breakdown" && (
+        <>
+          <Button icon={<RiArrowLeftFill />} text="Back" onClick={() => setSubMod({ ...subMod, name: "overview" })} />
+          <Breakdown month={subMod.month || 1} year={subMod.year || 2020} />
+        </>
+      )}
     </div>
   );
 };

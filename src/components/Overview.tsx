@@ -1,108 +1,97 @@
 import * as React from "react";
 import { LineGraph, Loader, Table, TableBody, TableCell, TableHeader, TableRow } from "simp-ui";
 import "../styles/overview.sass";
-
-type dataFormat = {
-  year: number;
-  month: string;
-  expenses: {
-    [key: string]: number;
-  };
-  incomes: {
-    [key: string]: number;
-  };
-}[];
+import { AppDataContext } from "./AppDataContext";
 
 type OverviewProps = {
-  headerAction: (value: { month: string; year: number }) => void;
+  headerAction: (value: { month: number; year: number }) => void;
 };
 
 export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
-  const [data, setData] = React.useState<dataFormat>([]);
+  const data = React.useContext(AppDataContext)?.data;
 
-  React.useEffect(() => {
-    fetch("https://my.api.mockaroo.com/chipmunk-monthly-expenses-and-incomes.json?key=b1b7fe80")
-      .then(response => response.json())
-      .then(json => {
-        setData(json);
-      });
-  }, []);
+  type timeframe = {
+    month: number;
+    year: number;
+  };
+
+  const timeframes: timeframe[] = [];
+  for (let i = 0; i < 11; i++) {
+    const today = new Date();
+    const month = today.getMonth() + i;
+    const year = today.getFullYear() + (month > 12 ? 1 : 0);
+    timeframes.push({
+      month: month - (month > 12 ? 12 : 0),
+      year: year,
+    });
+  }
+
+  const formatAmounts = (value: number | undefined, isTotal: boolean) => {
+    return !value
+      ? "$0"
+      : value > 0
+      ? "$" + Math.abs(value)
+      : isTotal
+      ? "($" + Math.abs(value) + ")"
+      : "$" + Math.abs(value);
+  };
 
   return (
     <div className="budget-overview">
       <div className="budget-overview-header">Monthly Expenses and Incomes</div>
       <div>Click on a column header to view a detailed breakdown.</div>
       <div className="budget-overview-table">
-        {data.length < 1 ? (
+        {!data ? (
           <Loader />
         ) : (
           <Table>
             <TableHeader>
               <TableCell header>Category</TableCell>
-              {data.map(month => (
-                <TableCell
-                  header
-                  clickable
-                  onClick={() => headerAction({ month: month.month, year: month.year })}
-                  key={month.month}
-                >
-                  {month.month}
+              {timeframes.map(timeframe => (
+                <TableCell header clickable onClick={() => headerAction(timeframe)} key={timeframe.month}>
+                  {new Date(timeframe.year, timeframe.month).toLocaleString("default", { month: "short" })}
                 </TableCell>
               ))}
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell group="positive" colspan={data.length + 1}>
-                  Incomes
-                </TableCell>
-              </TableRow>
-              {Object.keys(data[0].incomes).map(incomeCategory => {
+              {(Object.keys(data.categories) as ("expenses" | "incomes")[]).map(category => {
+                const group = category === "incomes" ? "positive" : "negative";
                 return (
-                  <TableRow key={incomeCategory}>
-                    <TableCell group="positive" indent={1}>
-                      {incomeCategory.charAt(0).toUpperCase() + incomeCategory.slice(1)}
-                    </TableCell>
-                    {data.map((month, i) => {
-                      return <TableCell key={"td" + i}>${month.incomes[incomeCategory]}</TableCell>;
+                  <React.Fragment key={category}>
+                    <TableRow>
+                      <TableCell group={group} colspan={13}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </TableCell>
+                    </TableRow>
+                    {Object.keys(data.categories[category]).map(key => {
+                      return (
+                        <TableRow key={key}>
+                          <TableCell group={group} indent={1} key={key}>
+                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                          </TableCell>
+                          {timeframes.map(timeframe => {
+                            let amount = data.timeframes.filter(
+                              item => item.month === timeframe.month && item.year === timeframe.year
+                            )[0]?.actual[category]?.[key]?.amount;
+                            return (
+                              <TableCell key={timeframe.month}>
+                                {amount ? formatAmounts(amount, false) : "$0"}
+                              </TableCell>
+                            );
+                          })}
+                        </TableRow>
+                      );
                     })}
-                  </TableRow>
+                  </React.Fragment>
                 );
               })}
               <TableRow>
-                <TableCell group="negative" colspan={data.length + 1}>
-                  Expenses
-                </TableCell>
-              </TableRow>
-              {Object.keys(data[0].expenses).map(expenseCategory => {
-                return (
-                  <TableRow key={expenseCategory}>
-                    <TableCell group="negative" indent={1}>
-                      {expenseCategory.charAt(0).toUpperCase() + expenseCategory.slice(1)}
-                    </TableCell>
-                    {data.map((month, i) => {
-                      return <TableCell key={"td" + i}>${month.expenses[expenseCategory]}</TableCell>;
-                    })}
-                  </TableRow>
-                );
-              })}
-              <TableRow>
-                <TableCell group="total" colspan={data.length + 1}>
-                  Total
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell group="total" indent={1}>
-                  Totals
-                </TableCell>
-                {data.map((month, i) => {
-                  const expenses = Object.keys(month.expenses).reduce((a, b) => a + month.expenses[b], 0);
-                  const incomes = Object.keys(month.incomes).reduce((a, b) => a + month.incomes[b], 0);
-                  return (
-                    <TableCell key={"td" + i}>
-                      {expenses > incomes ? "(" : ""}${Math.abs(incomes - expenses)}
-                      {expenses > incomes ? ")" : ""}
-                    </TableCell>
-                  );
+                <TableCell group="total">Total</TableCell>
+                {timeframes.map(timeframe => {
+                  let amount = data.timeframes.filter(
+                    item => item.month === timeframe.month && item.year === timeframe.year
+                  )[0]?.actual.amount;
+                  return <TableCell key={timeframe.month}>{amount ? formatAmounts(amount, true) : "$0"}</TableCell>;
                 })}
               </TableRow>
             </TableBody>
@@ -110,7 +99,7 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
         )}
       </div>
       <div className="budget-overview-graph">
-        {data.length < 1 ? null : (
+        {!data ? null : (
           <LineGraph
             lines={[
               {
@@ -121,8 +110,14 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
                   pointFill: "white",
                   pointRadius: 2,
                 },
-                data: data.map(month => {
-                  return { x: month.month, y: Object.keys(month.incomes).reduce((a, b) => a + month.incomes[b], 0) };
+                data: timeframes.map(timeframe => {
+                  let month = data.timeframes.filter(
+                    dataTimeframe => timeframe.month === dataTimeframe.month && timeframe.year === dataTimeframe.year
+                  )[0];
+                  return {
+                    x: new Date(timeframe.year, timeframe.month).toLocaleString("default", { month: "short" }),
+                    y: month ? month.actual.incomes.amount : 0,
+                  };
                 }),
               },
               {
@@ -133,8 +128,14 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
                   pointFill: "white",
                   pointRadius: 2,
                 },
-                data: data.map(month => {
-                  return { x: month.month, y: Object.keys(month.expenses).reduce((a, b) => a + month.expenses[b], 0) };
+                data: timeframes.map(timeframe => {
+                  let month = data.timeframes.filter(
+                    dataTimeframe => timeframe.month === dataTimeframe.month && timeframe.year === dataTimeframe.year
+                  )[0];
+                  return {
+                    x: new Date(timeframe.year, timeframe.month).toLocaleString("default", { month: "short" }),
+                    y: month ? month.actual.expenses.amount : 0,
+                  };
                 }),
               },
             ]}
