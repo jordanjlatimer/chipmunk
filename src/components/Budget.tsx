@@ -8,8 +8,8 @@ import { RiArrowLeftFill } from "@meronex/icons/ri";
 export const Budget: React.FC<{}> = () => {
   const [subMod, setSubMod] = React.useState<{
     name: string;
-    month: number | undefined;
-    year: number | undefined;
+    month?: number;
+    year?: number;
   }>({ name: "overview", month: undefined, year: undefined });
 
   return (
@@ -19,10 +19,10 @@ export const Budget: React.FC<{}> = () => {
           headerAction={(value: { month: number; year: number }) => setSubMod({ ...value, name: "breakdown" })}
         />
       )}
-      {subMod.name === "breakdown" && (
+      {subMod.name === "breakdown" && subMod.year && subMod.month && (
         <>
           <Button icon={<RiArrowLeftFill />} text="Back" onClick={() => setSubMod({ ...subMod, name: "overview" })} />
-          <Breakdown month={subMod.month || 1} year={subMod.year || 2020} />
+          <Breakdown month={subMod.month} year={subMod.year} />
         </>
       )}
     </div>

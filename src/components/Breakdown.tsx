@@ -7,19 +7,21 @@ import { AddExpense } from "./AddExpense";
 import { AppDataContext } from "./AppDataContext";
 
 type BreakdownProps = {
-  month: number;
-  year: number;
-  buttonAction?: (value: string) => void;
+  month?: number;
+  year?: number;
 };
 
-export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction }) => {
+type modalProps = {
+  open: boolean;
+  contents: React.ReactNode | undefined;
+};
+
+export const Breakdown: React.FC<BreakdownProps> = ({ month, year }) => {
   const data = React.useContext(AppDataContext)?.data;
-  const [modalProps, setModalProps] = React.useState({ open: false, contents: "" });
+  const [modal, setModal] = React.useState<modalProps>({ open: false, contents: undefined });
   const [notice, setNotice] = React.useState({ mounted: false, message: "" });
 
-  const currentTimeframe = data?.timeframes.filter(
-    timeframe => timeframe.year === year && timeframe.month === month
-  )[0];
+  const currentTimeframe = data?.timeframes?.[year!]?.[month!];
 
   React.useEffect(() => {
     if (notice.mounted) {
@@ -39,10 +41,10 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
 
   return (
     <div className="budget-breakdown">
-      {notice.mounted ? <Notice text={notice.message} position={{ left: "200px" }} /> : null}
+      {notice.mounted ? <Notice text={notice.message} /> : null}
       <div className="budget-breakdown-header">
         {"Breakdown - " +
-          new Date(year, month).toLocaleDateString("default", { month: "short" }) +
+          new Date(year || 0, month || 0).toLocaleDateString("default", { month: "short" }) +
           ", " +
           year +
           " Budget"}
@@ -53,13 +55,9 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
           marginRight
           color="green"
           text="Add an Income"
-          onClick={() => setModalProps({ open: true, contents: "add-income" })}
+          onClick={() => setModal({ open: true, contents: "add-income" })}
         />
-        <Button
-          color="red"
-          text="Add an Expense"
-          onClick={() => setModalProps({ open: true, contents: "add-expense" })}
-        />
+        <Button color="red" text="Add an Expense" onClick={() => setModal({ open: true, contents: "add-expense" })} />
         <Button color="blue" text="Print" icon={<RiPrinterFill />} floatRight />
       </div>
       <div className="budget-breakdown-table">
@@ -67,59 +65,109 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
           <Table>
             <TableHeader>
               <TableCell header>Category</TableCell>
-              <TableCell header>Amount</TableCell>
+              <TableCell header>Budgeted</TableCell>
+              <TableCell header>Notes (If Any)</TableCell>
+              <TableCell header>Actual</TableCell>
               <TableCell header>Notes (If Any)</TableCell>
             </TableHeader>
             <TableBody>
-              {(Object.keys(data.categories) as ("expenses" | "incomes")[]).map(category => {
+              {/*For each category in ["expenses", "incomes"], add a group of rows starting with one labeling the category*/}
+              {["incomes", "expenses"].map(category => {
                 const group = category === "incomes" ? "positive" : "negative";
                 return (
                   <React.Fragment key={category}>
                     <TableRow key={category}>
-                      <TableCell group={group} colspan={3}>
+                      <TableCell group={group} colspan={5}>
                         {category.charAt(0).toUpperCase() + category.slice(1)}
                       </TableCell>
                     </TableRow>
-                    {Object.keys(data.categories[category]).map(key => {
-                      const hasSubs = data.categories[category]?.[key].length > 0;
+                    {/*For each subcategory within the category, add a row with its amounts and notes, or 2nd level subcategories*/}
+                    {Object.keys(data.categories[category as "incomes" | "expenses"]).map(subcategory => {
+                      const hasSubs = data?.categories?.[category as "incomes" | "expenses"]?.[subcategory];
                       return (
-                        <React.Fragment key={key}>
-                          <TableRow key={key}>
-                            <TableCell group={group} indent={1} colspan={hasSubs ? 3 : 1}>
-                              {key.charAt(0).toUpperCase() + key.slice(1)}
+                        <React.Fragment key={subcategory}>
+                          <TableRow key={subcategory}>
+                            <TableCell group={group} indent={1} colspan={hasSubs ? 5 : 1}>
+                              {subcategory}
                             </TableCell>
                             {!hasSubs ? (
                               <>
                                 <TableCell>
-                                  {currentTimeframe
-                                    ? formatAmounts(currentTimeframe.actual[category]?.[key]?.["amount"], false)
-                                    : "$0"}
+                                  {formatAmounts(
+                                    currentTimeframe?.budgeted?.[category as "incomes" | "expenses"]?.[subcategory]?.[
+                                      "amount"
+                                    ],
+                                    false
+                                  )}
                                 </TableCell>
                                 <TableCell>
-                                  {currentTimeframe && currentTimeframe.actual[category]?.[key]?.["note"]}
+                                  {
+                                    currentTimeframe?.budgeted?.[category as "incomes" | "expenses"]?.[subcategory]?.[
+                                      "note"
+                                    ]
+                                  }
+                                </TableCell>
+                                <TableCell>
+                                  {formatAmounts(
+                                    currentTimeframe?.actual?.[category as "incomes" | "expenses"]?.[subcategory]?.[
+                                      "amount"
+                                    ],
+                                    false
+                                  )}
+                                </TableCell>
+                                <TableCell>
+                                  {
+                                    currentTimeframe?.actual?.[category as "incomes" | "expenses"]?.[subcategory]?.[
+                                      "note"
+                                    ]
+                                  }
                                 </TableCell>
                               </>
                             ) : null}
                           </TableRow>
+                          {/*For each 2nd level subcategory, add a row with its amounts and notes*/}
                           {hasSubs
-                            ? data.categories[category]?.[key].map(subcategory => {
-                                return (
-                                  <TableRow key={subcategory}>
-                                    <TableCell group={group} indent={2}>
-                                      {subcategory}
-                                    </TableCell>
-                                    <TableCell>
-                                      {formatAmounts(
-                                        currentTimeframe?.actual[category]?.[key]?.[subcategory]?.amount,
-                                        false
-                                      )}
-                                    </TableCell>
-                                    <TableCell>
-                                      {currentTimeframe?.actual[category]?.[key]?.[subcategory]?.note}
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })
+                            ? Object.keys(data.categories[category as "incomes" | "expenses"][subcategory]!).map(
+                                subcategory2 => {
+                                  return (
+                                    <TableRow key={subcategory2}>
+                                      <TableCell group={group} indent={2}>
+                                        {subcategory2}
+                                      </TableCell>
+                                      <TableCell>
+                                        {formatAmounts(
+                                          currentTimeframe?.budgeted?.[category as "incomes" | "expenses"]?.[
+                                            subcategory
+                                          ]?.[subcategory2]?.amount,
+                                          false
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {
+                                          currentTimeframe?.budgeted?.[category as "incomes" | "expenses"]?.[
+                                            subcategory
+                                          ]?.[subcategory2]?.note
+                                        }
+                                      </TableCell>
+                                      <TableCell>
+                                        {formatAmounts(
+                                          currentTimeframe?.actual?.[category as "incomes" | "expenses"]?.[
+                                            subcategory
+                                          ]?.[subcategory2]?.amount,
+                                          false
+                                        )}
+                                      </TableCell>
+                                      <TableCell>
+                                        {
+                                          currentTimeframe?.actual?.[category as "incomes" | "expenses"]?.[
+                                            subcategory
+                                          ]?.[subcategory2]?.note
+                                        }
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                }
+                              )
                             : null}
                         </React.Fragment>
                       );
@@ -129,7 +177,8 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
               })}
               <TableRow bold>
                 <TableCell group="total">Total</TableCell>
-                <TableCell colspan={2}>{formatAmounts(currentTimeframe?.actual.amount, true)}</TableCell>
+                <TableCell colspan={2}>{formatAmounts(currentTimeframe?.budgeted?.amount, true)}</TableCell>
+                <TableCell colspan={2}>{formatAmounts(currentTimeframe?.actual?.amount, true)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -137,17 +186,17 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year, buttonAction 
           <Loader />
         )}
       </div>
-      <Modal position={{ left: "200px" }} open={modalProps.open}>
-        {modalProps.contents === "add-income" && (
+      <Modal open={modal.open}>
+        {modal.contents === "add-income" && (
           <AddIncome
             noticeCallback={(value: string) => setNotice({ mounted: true, message: value })}
-            modalCallback={() => setModalProps({ ...modalProps, open: false })}
+            modalCallback={() => setModal({ ...modal, open: false })}
           />
         )}
-        {modalProps.contents === "add-expense" && (
+        {modal.contents === "add-expense" && (
           <AddExpense
             noticeCallback={(value: string) => setNotice({ mounted: true, message: value })}
-            modalCallback={() => setModalProps({ ...modalProps, open: false })}
+            modalCallback={() => setModal({ ...modal, open: false })}
           />
         )}
       </Modal>

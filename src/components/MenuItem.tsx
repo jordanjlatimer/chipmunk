@@ -7,11 +7,9 @@ type MenuItemProps = {
   action: () => void;
 };
 
-export const MenuItem: React.FC<MenuItemProps> = ({ icon, label, action }) => {
-  return (
-    <div className="menu-item" onClick={action}>
-      {icon}
-      <div className="menu-item-label">{label}</div>
-    </div>
-  );
-};
+export const MenuItem: React.FC<MenuItemProps> = ({ icon, label, action }) => (
+  <div className="menu-item" onClick={action}>
+    {icon}
+    <div className="menu-item-label">{label}</div>
+  </div>
+);

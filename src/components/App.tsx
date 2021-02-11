@@ -4,33 +4,35 @@ import { Budget } from "./Budget";
 import "../styles/app.sass";
 import { RiCalendarTodoFill, RiHome4Fill, RiSettings5Fill } from "@meronex/icons/ri";
 import { ChipmunkIcon } from "./ChipmunkIcon";
-import { AppDataContext } from "./AppDataContext";
+import { AppData, AppDataContext } from "./AppDataContext";
 
 export const App: React.FC<{}> = () => {
-  const [curMod, setCurMod] = React.useState("budget");
-  const [appData, setAppData] = React.useState(undefined);
+  const [curMod, setCurMod] = React.useState<"budget" | "home" | "settings">("budget");
+  const [data, setData] = React.useState(undefined as AppData["data"]);
 
   React.useEffect(() => {
     fetch("https://orees7y5k3.execute-api.us-east-1.amazonaws.com/default/test", {
       method: "POST",
-      body: JSON.stringify({ Key: { username: "jordanjlatimer@gmail.com" }, TableName: "chipmunk" }),
+      body: JSON.stringify({
+        action: "get-all",
+        payload: {
+          Key: { username: "jordanjlatimer@gmail.com" },
+          TableName: "chipmunk",
+        },
+      }),
     })
       .then(response => response.json())
-      .then(json => setAppData(json["Item"]));
+      .then(json => setData(json["Item"]));
   }, []);
 
-  type modules = {
-    [key: string]: React.ReactNode;
-  };
-
-  const modules: modules = {
+  const modules = {
     budget: <Budget />,
     home: "Home",
     settings: "Settings",
   };
 
   return (
-    <AppDataContext.Provider value={{ data: appData, updateAppData: (value: {}) => setAppData(value) }}>
+    <AppDataContext.Provider value={{ data: data, updateAppData: (value: AppData["data"]) => setData(value) }}>
       <div className="menu">
         <ChipmunkIcon />
         <MenuItem action={() => setCurMod("home")} icon={<RiHome4Fill />} label="Home" />

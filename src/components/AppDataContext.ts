@@ -1,37 +1,41 @@
 import * as React from "react";
 
-export interface appData {
-  data: {
+export interface AppData {
+  data?: {
     categories: {
       [key in "expenses" | "incomes"]: {
-        [key: string]: string[];
+        [key: string]: null | {
+          [key: string]: null;
+        };
       };
     };
     username: string;
-    timeframes: ({
-      month: number;
-      year: number;
-    } & {
-      [key in "actual" | "budgeted"]: {
-        amount: number;
-      } & {
-        [key in "expenses" | "incomes"]: {
-          [key: string]: {
-            [key: string]: {
-              amount: number;
-              note: string;
+    timeframes: {
+      [key: string]: null | {
+        [key: string]:
+          | null
+          | {
+              [key in "actual" | "budgeted"]:
+                | null
+                | ({
+                    [key in "incomes" | "expenses"]:
+                      | null
+                      | ({
+                          [key: string]:
+                            | null
+                            | ({
+                                [key: string]: null | {
+                                  amount: number;
+                                  note: string;
+                                };
+                              } & { amount: number; note: string });
+                        } & { amount: number });
+                  } & { amount: number });
             };
-          } & {
-            amount: number;
-            note?: string;
-          };
-        } & {
-          amount: number;
-        };
       };
-    })[];
+    };
   };
-  updateAppData: (value: {}) => void;
+  updateAppData: (value: AppData["data"]) => void;
 }
 
-export const AppDataContext = React.createContext<appData | null>(null);
+export const AppDataContext = React.createContext<AppData | null>(null);
