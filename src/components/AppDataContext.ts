@@ -1,40 +1,24 @@
 import * as React from "react";
 
+export interface endCategory{
+  timeframes: {
+    [key: string]: {
+      [key: string]: {
+        actual: number,
+        budgeted: number
+      }
+    }
+  }
+}
+
+export interface category{
+  [key: string]: category | endCategory
+}
+
 export interface AppData {
   data?: {
-    categories: {
-      [key in "expenses" | "incomes"]: {
-        [key: string]: null | {
-          [key: string]: null;
-        };
-      };
-    };
-    username: string;
-    timeframes: {
-      [key: string]: null | {
-        [key: string]:
-          | null
-          | {
-              [key in "actual" | "budgeted"]:
-                | null
-                | ({
-                    [key in "incomes" | "expenses"]:
-                      | null
-                      | ({
-                          [key: string]:
-                            | null
-                            | ({
-                                [key: string]: null | {
-                                  amount: number;
-                                  note: string;
-                                };
-                              } & { amount: number; note: string });
-                        } & { amount: number });
-                  } & { amount: number });
-            };
-      };
-    };
-  };
+    [key in "expenses" | "incomes"]: category
+  } & {username: string}
   updateAppData: (value: AppData["data"]) => void;
 }
 

@@ -2,8 +2,7 @@ import * as React from "react";
 import { Loader, Modal, Button, Notice, Table, TableBody, TableCell, TableHeader, TableRow } from "simp-ui";
 import { RiPrinterFill } from "@meronex/icons/ri";
 import "../styles/breakdown.sass";
-import { AddIncome } from "./AddIncome";
-import { AddExpense } from "./AddExpense";
+import { Edit } from "./Edit";
 import { AppDataContext } from "./AppDataContext";
 
 type BreakdownProps = {
@@ -11,14 +10,9 @@ type BreakdownProps = {
   year?: number;
 };
 
-type modalProps = {
-  open: boolean;
-  contents: React.ReactNode | undefined;
-};
-
 export const Breakdown: React.FC<BreakdownProps> = ({ month, year }) => {
   const data = React.useContext(AppDataContext)?.data;
-  const [modal, setModal] = React.useState<modalProps>({ open: false, contents: undefined });
+  const [modalOpen, setModalOpen] = React.useState(false);
   const [notice, setNotice] = React.useState({ mounted: false, message: "" });
 
   const currentTimeframe = data?.timeframes?.[year!]?.[month!];
@@ -52,12 +46,10 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year }) => {
       <div>Here you can edit the month's budget.</div>
       <div className="budget-breakdown-actionbar">
         <Button
-          marginRight
           color="green"
-          text="Add an Income"
-          onClick={() => setModal({ open: true, contents: "add-income" })}
+          text="Edit"
+          onClick={() => setModalOpen(true)}
         />
-        <Button color="red" text="Add an Expense" onClick={() => setModal({ open: true, contents: "add-expense" })} />
         <Button color="blue" text="Print" icon={<RiPrinterFill />} floatRight />
       </div>
       <div className="budget-breakdown-table">
@@ -186,19 +178,13 @@ export const Breakdown: React.FC<BreakdownProps> = ({ month, year }) => {
           <Loader />
         )}
       </div>
-      <Modal open={modal.open}>
-        {modal.contents === "add-income" && (
-          <AddIncome
+      <Modal open={modalOpen}>
+          <Edit
+            month={month!}
+            year={year!}
             noticeCallback={(value: string) => setNotice({ mounted: true, message: value })}
-            modalCallback={() => setModal({ ...modal, open: false })}
+            modalCallback={() => setModalOpen(false)}
           />
-        )}
-        {modal.contents === "add-expense" && (
-          <AddExpense
-            noticeCallback={(value: string) => setNotice({ mounted: true, message: value })}
-            modalCallback={() => setModal({ ...modal, open: false })}
-          />
-        )}
       </Modal>
     </div>
   );

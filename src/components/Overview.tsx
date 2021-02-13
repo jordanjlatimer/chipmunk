@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Dropdown, LineGraph, Loader, Table, TableBody, TableCell, TableHeader, TableRow } from "simp-ui";
 import "../styles/overview.sass";
-import { AppDataContext } from "./AppDataContext";
+import { AppData, AppDataContext, category, endCategory } from "./AppDataContext";
 
 type OverviewProps = {
   headerAction: (value: { month: number; year: number }) => void;
@@ -9,7 +9,7 @@ type OverviewProps = {
 
 export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
   const data = React.useContext(AppDataContext)?.data;
-  const [view, setView] = React.useState("budgeted");
+  const [view, setView] = React.useState({label: "Budgeted", value: "budgeted"});
 
   type timeframe = {
     month: number;
@@ -17,7 +17,7 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
   };
 
   const timeframes: timeframe[] = [];
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < 12; i++) {
     const today = new Date();
     const month = today.getMonth() + i;
     const year = today.getFullYear() + (month > 12 ? 1 : 0);
@@ -27,14 +27,59 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
     });
   }
 
-  const formatAmounts = (value: number | undefined, isTotal: boolean) =>
-    !value
-      ? "$0"
-      : isTotal
+  const formatAmounts = (value: number, isTotal: boolean) =>
+      isTotal
       ? value < 0
         ? "($" + Math.abs(value) + ")"
         : "$" + Math.abs(value)
       : "$" + Math.abs(value);
+
+  const generateTableBody = (subData: any, indent: number, group?: string) => {
+    if (subData["timeframes"]){
+      return timeframes.map(timeframe => {
+        if (subData["timeframes"][timeframe.year.toString()]?.[timeframe.month.toString()]){
+          return (
+            <React.Fragment>
+              <TableCell>${subData["timeframes"][timeframe.year][timeframe.month][view.value === "both" ? "budgeted" : view.value]}</TableCell>
+              {view.value === "both" && <TableCell>${subData["timeframes"][timeframe.year][timeframe.month]["actual"]}</TableCell>}
+            </React.Fragment>
+          )
+        } else {
+          return (
+            <React.Fragment>
+              <TableCell>$0</TableCell>
+              {view.value === "both" && <TableCell>$0</TableCell>}
+            </React.Fragment>
+          )
+        }
+      })
+    } else {
+      return (
+        Object.keys(subData).filter(key => key !== "username").map(key => {
+          group = key === "Incomes" ? "positive" : key === "Expenses" ? "negative" : group
+          if (subData[key]["timeframes"]){
+            return (
+              <React.Fragment>
+                <TableRow>
+                  <TableCell group={group} indent={indent}>{key}</TableCell>
+                  {generateTableBody(subData[key], 0, group)}
+                </TableRow>
+              </React.Fragment>
+            )
+          } else {
+            return (
+              <React.Fragment>
+                <TableRow>
+                  <TableCell group={group} colspan={view.value === "both" ? 25 : 13} indent={indent}>{key}</TableCell>
+                </TableRow>
+                {generateTableBody(subData[key], indent + 1, group)}
+              </React.Fragment>
+            )
+          }
+        })
+      )
+    }
+  }
 
   return (
     <div className="budget-overview">
@@ -47,18 +92,17 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
           { label: "Actual", value: "actual" },
           { label: "Both", value: "both" },
         ]}
-        onChange={(value: { label: string; value: string }) => setView(value.value)}
-        placeholder="Budgeted"
+        onChange={(value: { label: string; value: string }) => setView(value)}
+        value={[view]}
       />
       <div className="budget-overview-table">
-        {data && (
+        {data ?
           <Table>
             <TableHeader>
               <TableCell header>Category</TableCell>
-              {/*Starting at current month, add a header for each month for the next 11 months*/}
               {timeframes.map(timeframe => (
                 <TableCell
-                  colspan={view === "both" ? 2 : 1}
+                  colspan={view.value === "both" ? 2 : 1}
                   header
                   clickable
                   onClick={() => headerAction(timeframe)}
@@ -69,71 +113,11 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
               ))}
             </TableHeader>
             <TableBody>
-              {/*For each category in ["expenses", "incomes"], add a group of rows starting with one labeling the category*/}
-              {["incomes", "expenses"].map(category => {
-                const group = category === "incomes" ? "positive" : "negative";
-                return (
-                  <React.Fragment key={category}>
-                    <TableRow>
-                      <TableCell group={group} colspan={26}>
-                        {category.charAt(0).toUpperCase() + category.slice(1)}
-                      </TableCell>
-                    </TableRow>
-                    {/*For each subcategory within the category, add a row with its amounts for each timeframe*/}
-                    {Object.keys(data.categories[category as "incomes" | "expenses"]).map(subcategory => (
-                      <TableRow key={subcategory}>
-                        <TableCell group={group} indent={1} key={subcategory}>
-                          {subcategory}
-                        </TableCell>
-                        {timeframes.map(timeframe => {
-                          let budgeted =
-                            data?.timeframes?.[timeframe.year]?.[timeframe.month]?.budgeted?.[
-                              category as "expenses" | "incomes"
-                            ]?.[subcategory]?.amount;
-                          let actual =
-                            data?.timeframes?.[timeframe.year]?.[timeframe.month]?.actual?.[
-                              category as "expenses" | "incomes"
-                            ]?.[subcategory]?.amount;
-                          return (
-                            <React.Fragment key={timeframe.month}>
-                              {(view === "both" || view === "budgeted") && (
-                                <TableCell key={"budgeted" + timeframe.month}>
-                                  {formatAmounts(budgeted, false)}
-                                </TableCell>
-                              )}
-                              {(view === "both" || view === "actual") && (
-                                <TableCell key={"actual" + timeframe.month}>{formatAmounts(actual, false)}</TableCell>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                      </TableRow>
-                    ))}
-                  </React.Fragment>
-                );
-              })}
-              {/* Inside a total row, add a total cell for each timeframe.*/}
-              <TableRow>
-                <TableCell group="total">Total</TableCell>
-                {timeframes.map((timeframe, i) => {
-                  let budgeted = data?.timeframes?.[timeframe.year]?.[timeframe.month]?.budgeted?.amount;
-                  let actual = data?.timeframes?.[timeframe.year]?.[timeframe.month]?.actual?.amount;
-                  return (
-                    <React.Fragment key={timeframe.month}>
-                      {(view === "budgeted" || view === "both") && (
-                        <TableCell key={"b" + timeframe.month}>{formatAmounts(budgeted, true)}</TableCell>
-                      )}
-                      {(view === "actual" || view === "both") && (
-                        <TableCell key={"a" + timeframe.month}>{formatAmounts(actual, true)}</TableCell>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </TableRow>
+              {generateTableBody(data, 0)}
             </TableBody>
           </Table>
-        )}
-        {!data && <Loader />}
+          : <Loader/>
+        }
       </div>
       <div className="budget-overview-graph">
         {data && (
