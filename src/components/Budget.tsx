@@ -11,9 +11,10 @@ export const Budget: React.FC<{}> = () => {
     month?: number;
     year?: number;
   }>({ name: "overview", month: undefined, year: undefined });
+  const ref = React.useRef<HTMLDivElement>(null);
 
   return (
-    <div className="budget">
+    <div className="budget" ref={ref}>
       {subMod.name === "overview" && (
         <Overview
           headerAction={(value: { month: number; year: number }) => setSubMod({ ...value, name: "breakdown" })}
@@ -22,7 +23,7 @@ export const Budget: React.FC<{}> = () => {
       {subMod.name === "breakdown" && subMod.year && subMod.month && (
         <>
           <Button icon={<RiArrowLeftFill />} text="Back" onClick={() => setSubMod({ ...subMod, name: "overview" })} />
-          <Breakdown month={subMod.month} year={subMod.year} />
+          <Breakdown month={subMod.month} year={subMod.year} parentRef={ref.current || undefined} />
         </>
       )}
     </div>

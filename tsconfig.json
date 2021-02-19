@@ -8,7 +8,8 @@
     "target": "ES6",
     "outDir": "dist",
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
   "exclude": ["node_modules"],
   "include": ["src"]

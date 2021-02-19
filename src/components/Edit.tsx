@@ -13,9 +13,9 @@ export const Edit: React.FC<EditProps> = ({ month, year, noticeCallback, modalCa
   const data = React.useContext(AppDataContext)?.data;
   const [form, setForm] = React.useState<{
     category?: "incomes" | "expenses";
-    kind?: "actual" | "budgeted"
-    subCategory?: {value: string, label: string};
-    subCategory2?: {value: string, label: string};
+    kind?: "actual" | "budgeted";
+    subCategory?: { value: string; label: string };
+    subCategory2?: { value: string; label: string };
     amount?: string;
     note?: string;
   }>({});
@@ -35,17 +35,17 @@ export const Edit: React.FC<EditProps> = ({ month, year, noticeCallback, modalCa
             "#c": form.kind,
             "#d": form.category,
             "#e": form.subCategory?.value,
-            "#f": "amount"
+            "#f": "amount",
           },
           ExpressionAttributeValues: {
-            ":a": form.amount
-          }
+            ":a": form.amount,
+          },
         },
       }),
     })
       .then(response => response.json())
       .then(json => console.log(json));
-    return true
+    return true;
   };
 
   return (
@@ -59,7 +59,7 @@ export const Edit: React.FC<EditProps> = ({ month, year, noticeCallback, modalCa
             { label: "Actual", value: "actual" },
             { label: "Budgeted", value: "budgeted" },
           ]}
-          onChange={(value: string) => setForm({ ...form, kind: value as "actual" | "budgeted"})}
+          onChange={(value: string) => setForm({ ...form, kind: value as "actual" | "budgeted" })}
         />
         <RadioInput
           horizontal
@@ -69,18 +69,20 @@ export const Edit: React.FC<EditProps> = ({ month, year, noticeCallback, modalCa
             { label: "Income", value: "incomes" },
             { label: "Expense", value: "expenses" },
           ]}
-          onChange={(value: string) => setForm({ ...form, category: value as "incomes" | "expenses", subCategory: undefined, subCategory2: undefined })}
+          onChange={(value: string) =>
+            setForm({
+              ...form,
+              category: value as "incomes" | "expenses",
+              subCategory: undefined,
+              subCategory2: undefined,
+            })
+          }
         />
       </Container>
       <Container flex>
         <Dropdown
           label="Category"
-          disabled={
-            !(
-              form.category &&
-              data?.categories[form.category]
-            )
-          }
+          disabled={!(form.category && data?.categories[form.category])}
           options={
             form.category &&
             data?.categories[form.category] &&
@@ -118,7 +120,12 @@ export const Edit: React.FC<EditProps> = ({ month, year, noticeCallback, modalCa
       </Container>
       <Container flex>
         <div>Current Amount: </div>
-        <Input label="New Amount" prefix="$" changeValidation={(value: string) => !isNaN(value)} onChange={(value: string) => setForm({ ...form, amount: value })} />
+        <Input
+          label="New Amount"
+          prefix="$"
+          changeValidation={(value: string) => !isNaN(value)}
+          onChange={(value: string) => setForm({ ...form, amount: value })}
+        />
       </Container>
       <Container flex>
         <TextArea label="New Note" width="long" onChange={(value: string) => setForm({ ...form, note: value })} />
@@ -129,9 +136,7 @@ export const Edit: React.FC<EditProps> = ({ month, year, noticeCallback, modalCa
           text="Submit"
           marginRight
           onClick={() => {
-            submitForm() &&
-            (noticeCallback("Value updated successfully."),
-            modalCallback())
+            submitForm() && (noticeCallback("Value updated successfully."), modalCallback());
           }}
         />
         <Button text="Cancel" color="red" onClick={modalCallback} />

@@ -9,7 +9,7 @@ type OverviewProps = {
 
 export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
   const data = React.useContext(AppDataContext)?.data;
-  const [view, setView] = React.useState({label: "Budgeted", value: "budgeted"});
+  const [view, setView] = React.useState({ label: "Budgeted", value: "budgeted" });
 
   type timeframe = {
     month: number;
@@ -27,63 +27,109 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
     });
   }
 
-  const formatAmounts = (value: number, isTotal: boolean) =>
-      isTotal
-      ? value < 0
-        ? "($" + Math.abs(value) + ")"
-        : "$" + Math.abs(value)
-      : "$" + Math.abs(value);
-
-  const generateTableBody = (subData: any, indent: number, group?: string) => {
-    if (subData["timeframes"]){
-      return timeframes.map(timeframe => {
-        if (subData["timeframes"][timeframe.year.toString()]?.[timeframe.month.toString()]){
-          return (
-            <React.Fragment>
-              <TableCell>${subData["timeframes"][timeframe.year][timeframe.month][view.value === "both" ? "budgeted" : view.value]}</TableCell>
-              {view.value === "both" && <TableCell>${subData["timeframes"][timeframe.year][timeframe.month]["actual"]}</TableCell>}
-            </React.Fragment>
-          )
-        } else {
-          return (
-            <React.Fragment>
-              <TableCell>$0</TableCell>
-              {view.value === "both" && <TableCell>$0</TableCell>}
-            </React.Fragment>
-          )
-        }
-      })
+  function getCategoryTotal(data: category | endCategory, timeframe: timeframe, group: "budgeted" | "actual"): number {
+    let returnValue = 0;
+    if (data.timeframes) {
+      if (data.timeframes[timeframe.year]?.[timeframe.month]) {
+        returnValue += data.timeframes[timeframe.year][timeframe.month][group];
+      }
     } else {
-      return (
-        Object.keys(subData).filter(key => key !== "username").map(key => {
-          group = key === "Incomes" ? "positive" : key === "Expenses" ? "negative" : group
-          if (subData[key]["timeframes"]){
+      Object.keys(data).forEach(key => (returnValue += getCategoryTotal((data as category)[key], timeframe, group)));
+    }
+    return returnValue;
+  }
+
+  function formatValue(value: number, isTotal?: boolean) {
+    if (isTotal && value < 0) {
+      return "($" + Math.abs(Math.round(value * 100) / 100) + ")";
+    } else {
+      return "$" + Math.abs(Math.round(value * 100) / 100);
+    }
+  }
+
+  function generateTableBody(data: AppData["data"]) {
+    if (data) {
+      return Object.keys(data)
+        .filter(key => key !== "username")
+        .map(category => {
+          const group = category === "Incomes" ? "positive" : category === "Expenses" ? "negative" : "total";
+          if (category === "Totals") {
             return (
-              <React.Fragment>
-                <TableRow>
-                  <TableCell group={group} indent={indent}>{key}</TableCell>
-                  {generateTableBody(subData[key], 0, group)}
-                </TableRow>
-              </React.Fragment>
-            )
+              <TableRow group="total">
+                <TableCell group={group}>Total</TableCell>
+                {timeframes.map(timeframe => {
+                  return (
+                    <React.Fragment>
+                      {(view.value === "budgeted" || view.value === "both") && (
+                        <TableCell>
+                          {formatValue(getCategoryTotal(data[category], timeframe, "budgeted"), true)}
+                        </TableCell>
+                      )}
+                      {(view.value === "actual" || view.value === "both") && (
+                        <TableCell>
+                          {formatValue(getCategoryTotal(data[category], timeframe, "actual"), true)}
+                        </TableCell>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </TableRow>
+            );
           } else {
             return (
               <React.Fragment>
                 <TableRow>
-                  <TableCell group={group} colspan={view.value === "both" ? 25 : 13} indent={indent}>{key}</TableCell>
+                  <TableCell group={group} colspan={view.value === "both" ? 25 : 13}>
+                    {category}
+                  </TableCell>
                 </TableRow>
-                {generateTableBody(subData[key], indent + 1, group)}
+                {Object.keys(data[category as "Incomes" | "Expenses"]).map(subcategory => (
+                  <TableRow>
+                    <TableCell group={group} indent={1}>
+                      {subcategory}
+                    </TableCell>
+                    {timeframes.map(timeframe => {
+                      return (
+                        <React.Fragment>
+                          {(view.value === "budgeted" || view.value === "both") && (
+                            <TableCell>
+                              {formatValue(
+                                getCategoryTotal(
+                                  data[category as "Incomes" | "Expenses"][subcategory],
+                                  timeframe,
+                                  "budgeted"
+                                )
+                              )}
+                            </TableCell>
+                          )}
+                          {(view.value === "actual" || view.value === "both") && (
+                            <TableCell>
+                              {formatValue(
+                                getCategoryTotal(
+                                  data[category as "Incomes" | "Expenses"][subcategory],
+                                  timeframe,
+                                  "actual"
+                                )
+                              )}
+                            </TableCell>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </TableRow>
+                ))}
               </React.Fragment>
-            )
+            );
           }
-        })
-      )
+        });
+    } else {
+      return null;
     }
   }
 
   return (
     <div className="budget-overview">
-      <div className="budget-overview-header">Monthly Expenses and Incomes</div>
+      <div className="budget-overview-header">Budget Overview</div>
       <div>Click on a column header to view a detailed breakdown.</div>
       <Dropdown
         label="Select View"
@@ -96,7 +142,7 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
         value={[view]}
       />
       <div className="budget-overview-table">
-        {data ?
+        {data ? (
           <Table>
             <TableHeader>
               <TableCell header>Category</TableCell>
@@ -112,15 +158,14 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
                 </TableCell>
               ))}
             </TableHeader>
-            <TableBody>
-              {generateTableBody(data, 0)}
-            </TableBody>
+            <TableBody>{generateTableBody(data)}</TableBody>
           </Table>
-          : <Loader/>
-        }
+        ) : (
+          <Loader />
+        )}
       </div>
-      <div className="budget-overview-graph">
-        {data && (
+      {/*data &&
+        <div className="budget-overview-graph">
           <LineGraph
             lines={[
               {
@@ -159,8 +204,8 @@ export const Overview: React.FC<OverviewProps> = ({ headerAction }) => {
             yPrefix="$"
             legend
           />
-        )}
-      </div>
+        </div>
+      */}
     </div>
   );
 };
